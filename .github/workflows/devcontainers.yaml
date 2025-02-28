@@ -43,7 +43,7 @@ jobs:
           context: ./cli
           file: ./cli/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKER_URL }}/lara-cli:${{ github.sha }}
+          tags: ${{ secrets.DOCKER_URL }}/library/lara-cli:${{ github.sha }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new
 
@@ -53,7 +53,7 @@ jobs:
           context: ./fpm
           file: ./fpm/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKER_URL }}/lara-fpm:${{ github.sha }}
+          tags: ${{ secrets.DOCKER_URL }}/library/lara-fpm:${{ github.sha }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new
 
@@ -63,7 +63,7 @@ jobs:
           context: ./nginx
           file: ./nginx/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKER_URL }}/lara-nginx:${{ github.sha }}
+          tags: ${{ secrets.DOCKER_URL }}/library/lara-nginx:${{ github.sha }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new
 
