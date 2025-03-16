@@ -37,15 +37,25 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
+      # Add debug step to verify login worked
+      - name: Verify Docker Login
+        run: |
+          echo "Checking Docker configuration"
+          cat ~/.docker/config.json | grep -v password | grep -v auth
+
       - name: Build and Push Image - cli
         uses: docker/build-push-action@v4
         with:
           context: ./cli
           file: ./cli/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKER_URL }}/library/lara-cli:${{ github.sha }}
+          tags: ${{ secrets.DOCKER_URL }}/lara-cli:${{ github.sha }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new
+          # Add registry credentials explicitly to build-push action
+          registry: ${{ secrets.DOCKER_URL }}
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build and Push Image - fpm
         uses: docker/build-push-action@v4
@@ -53,9 +63,13 @@ jobs:
           context: ./fpm
           file: ./fpm/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKER_URL }}/library/lara-fpm:${{ github.sha }}
+          tags: ${{ secrets.DOCKER_URL }}/lara-fpm:${{ github.sha }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new
+          # Add registry credentials explicitly to build-push action
+          registry: ${{ secrets.DOCKER_URL }}
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build and Push Image - nginx
         uses: docker/build-push-action@v4
@@ -63,9 +77,13 @@ jobs:
           context: ./nginx
           file: ./nginx/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKER_URL }}/library/lara-nginx:${{ github.sha }}
+          tags: ${{ secrets.DOCKER_URL }}/lara-nginx:${{ github.sha }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new
+          # Add registry credentials explicitly to build-push action
+          registry: ${{ secrets.DOCKER_URL }}
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Update Cache Directory
         if: always()
