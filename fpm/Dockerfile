@@ -16,7 +16,9 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install PHP extensions
 RUN docker-php-ext-install pdo_mysql mysqli mbstring exif pcntl bcmath xml zip
-RUN docker-php-ext-configure gd --with-external-gd
+# RUN docker-php-ext-configure gd --with-external-gd
+# 
+# Fix: Configure GD properly for PHP 8.3
 RUN docker-php-ext-install gd
 
 # Install Redis extension
