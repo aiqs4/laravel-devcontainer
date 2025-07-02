@@ -43,13 +43,24 @@ jobs:
           echo "Checking Docker configuration"
           cat ~/.docker/config.json | grep -v password | grep -v auth
 
+      - name: Generate build metadata
+        id: meta
+        run: |
+          echo "date=$(date +'%Y%m%d')" >> $GITHUB_OUTPUT
+          echo "datetime=$(date +'%Y%m%d-%H%M%S')" >> $GITHUB_OUTPUT
+
       - name: Build and Push CLI Image
         uses: docker/build-push-action@v6  # Latest stable version
         with:
           context: ./cli
           file: ./cli/Dockerfile
+          # platforms: linux/amd64,linux/arm64  # Multi-platform support
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/lara-cli:${{ github.sha }}
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/lara-cli:latest
+            ${{ secrets.DOCKER_USERNAME }}/lara-cli:${{ steps.meta.outputs.date }}
+            ${{ secrets.DOCKER_USERNAME }}/lara-cli:${{ steps.meta.outputs.datetime }}
+            ${{ secrets.DOCKER_USERNAME }}/lara-cli:${{ github.sha }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
           # Removed redundant credentials as login-action handles this
@@ -59,8 +70,13 @@ jobs:
         with:
           context: ./fpm
           file: ./fpm/Dockerfile
+          # platforms: linux/amd64,linux/arm64  # Multi-platform support
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/lara-fpm:${{ github.sha }}
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/lara-fpm:latest
+            ${{ secrets.DOCKER_USERNAME }}/lara-fpm:${{ steps.meta.outputs.date }}
+            ${{ secrets.DOCKER_USERNAME }}/lara-fpm:${{ steps.meta.outputs.datetime }}
+            ${{ secrets.DOCKER_USERNAME }}/lara-fpm:${{ github.sha }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
           # Removed redundant credentials
@@ -72,7 +88,11 @@ jobs:
           file: ./nginx/Dockerfile
           # platforms: linux/amd64,linux/arm64  # Multi-platform support
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/lara-nginx:${{ github.sha }}
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/lara-nginx:latest
+            ${{ secrets.DOCKER_USERNAME }}/lara-nginx:${{ steps.meta.outputs.date }}
+            ${{ secrets.DOCKER_USERNAME }}/lara-nginx:${{ steps.meta.outputs.datetime }}
+            ${{ secrets.DOCKER_USERNAME }}/lara-nginx:${{ github.sha }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
           # Removed redundant credentials
